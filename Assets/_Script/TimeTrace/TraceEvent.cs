@@ -4,16 +4,16 @@ using UnityEngine;
 
 namespace TimeTrace {
     [System.Serializable]
-    public class TraceEvent {
+    public class TraceEvent : TimeTraceData {
         /// <summary>
         /// name of this event
         /// </summary>
         public string name;
 
-        /// <summary>
-        /// Time that this event happens
-        /// </summary>
-        public float time;
+        public TraceEvent() : base(TimeTraceManager.time, TimeTraceManager.frameCount)
+        {
+
+        }
         
         /// <summary>
         /// Trigger if timeScale > 0
@@ -28,9 +28,14 @@ namespace TimeTrace {
             }
         }
         
+        /// <summary>
+        /// Init event time with current time
+        /// Mark the name with EventName
+        /// </summary>
         public void Init() {
             name = EventName;
             time = TimeTraceManager.time;
+            frame = TimeTraceManager.frameCount;
         }
 
         /// <summary>

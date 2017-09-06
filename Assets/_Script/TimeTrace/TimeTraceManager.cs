@@ -3,28 +3,25 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace TimeTrace {
-    public class TimeTraceManager : MonoBehaviour {
+    public class TimeTraceManager : MonoBehaviour, IFrameRecordable {
         public static TimeTraceManager Instance {
             get {
                 if (m_instance == null) {
-                    m_instance = Create();
+                    Create();
                 }
                 return m_instance;
             }
         }
-
-        public static EventTracer eventTracer {
-            get { return Instance._eventTracer; }
-        }
-
-
-        public float fixedDeltaTime = 0.02f;
+        
         public static float time { get { return Instance.m_time; } }
         public static float timeScale { get { return Instance.m_timeScale; } }
-        //public static float deltaTime { get { return Instance.m_timeScale * Time.deltaTime; } }
-        public static float deltaTime { get { return Instance.m_timeScale * Instance.fixedDeltaTime; } }
+        public static float deltaTime { get { return Instance.m_timeScale * Time.deltaTime; } }
         public static bool tracing { get { return Instance.m_tracing; } }
-        
+        public static bool backTracing { get { return Instance.m_backTracing; } }
+        public static int frameCount { get { return Mathf.RoundToInt(Instance.m_frame); } }
+        public static int deltaFrame { get { return frameCount - Instance.m_previousFrameCount; } }
+        public static int maxRecordFrame { get { return 1800; } }
+
         /// <summary>
         /// Start a new trace, by timeScale
         /// </summary>
@@ -50,34 +47,36 @@ namespace TimeTrace {
         
         /// <summary>
         /// Add a new trace event
+        /// If not tracing, invoke this event immediately
         /// </summary>
         /// <param name="e"></param>
         public static void AddTraceEvent(TraceEvent e) {
             e.Init();
             e.Trace(deltaTime);
-            eventTracer.Add(e);
+            //Debug.Log("add event: " + e.name + ", t: " + e.time + ", ct: " + time);
+            Instance.DataTracer.AddData(e);
+        }
+
+        private static TimeTraceManager m_instance;
+        public static TimeTraceManager Create()
+        {
+            var go = new GameObject("TimeTraceManager");
+            m_instance = go.AddComponent<TimeTraceManager>();
+            return m_instance;
         }
 
         public float m_time = 0;
         public float m_timeScale = 1;
         public float m_startTimeOfTracing = 0;
         public bool m_tracing = false;
-        public EventTracer m_eventTracer;
-
+        public float m_frame = 0;
+        public int m_previousFrameCount = 0;
+        public bool m_backTracing { get { return m_tracing && m_timeScale < 0; } }
         
-
-
-        private static TimeTraceManager m_instance;
-        private static TimeTraceManager Create() {
-            var go = new GameObject("TimeTraceManager");
-            return go.AddComponent<TimeTraceManager>();
-        }
-
 
         public void StartTraceByTimeScale(float timeScale) {
             m_startTimeOfTracing = time;
             m_timeScale = timeScale;
-            eventTracer.SetTraceTime(time);
             m_tracing = true;
         }
 
@@ -87,41 +86,46 @@ namespace TimeTrace {
 
         public void StopTraceByTimeScale() {
             m_timeScale = 1;
-            eventTracer.DiscardFutureEvents();
             m_tracing = false;
 
             m_time = Mathf.Clamp(m_time, 0, m_startTimeOfTracing);
         }
         
-        public EventTracer _eventTracer {
-            get {
-                if (m_eventTracer == null)
-                    m_eventTracer = gameObject.AddComponent<EventTracer>();
-                return m_eventTracer;
-            }
-        }
 
-
-        void Awake() {
-            //if (m_instance != this)
-            //    m_instance = this;
-        }
-
-
-        void Update() {
+        private void Update()
+        {
+            m_previousFrameCount = frameCount;
             m_time += deltaTime;
-
-            if (tracing) {
+            m_frame += timeScale;
+            
+            if (tracing)
+            {
                 // Stops backtracking when time goes to zero
                 // stops fronttracking when time goes to start of tracing
                 if (time <= 0 && timeScale < 0)
                     m_timeScale = 0;
                 if (time >= m_startTimeOfTracing && timeScale > 0)
                     m_timeScale = 0;
-
-                eventTracer.Trace(deltaTime);
-
             }
+
+            DataTracer.UpdateLoadSaveFrameData(this);
         }
+
+        #region IFrameRecordable
+        public FrameDataTracer dataTracer = new FrameDataTracer();
+        public FrameDataTracer DataTracer { get { return dataTracer; } }
+        public bool AutoSaveFrameData { get { return false; } }
+        public void LoadFrameData(TimeTraceData data)
+        {
+            var _event = data as TraceEvent;
+            //Debug.Log("load event: " + _event.name + ", t: " + _event.time + ", ct: " + time);
+            _event.Trace(deltaTime);
+        }
+
+        public TimeTraceData GetFrameData(float time, int frame)
+        {
+            return TimeTraceData.Null;
+        }
+        #endregion
     }
 }

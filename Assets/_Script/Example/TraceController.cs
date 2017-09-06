@@ -5,6 +5,15 @@ using UnityEngine;
 using TimeTrace;
 using System;
 
+public class PositionTimeTraceData : TimeTraceData
+{
+    public Vector3 position;
+    public PositionTimeTraceData(float time, int frame, Vector3 position) : base(time, frame)
+    {
+        this.position = position;
+    }
+}
+
 public class TraceController : TraceBehaviour {
     public float speed = 10;
     public float jumpSpeed = 10;
@@ -29,7 +38,10 @@ public class TraceController : TraceBehaviour {
         cc = GetComponent<CharacterController>();
     }
 
-    public override void TraceUpdate(float deltaTime) {
+    public override void RevertableUpdate(float deltaTime) {
+        if (TimeTraceManager.tracing)
+            return;
+
         if (cc.isGrounded && !isGrounded && deltaTime > 0 && cc.velocity.y < -0.01f)
             TimeTraceManager.AddTraceEvent(new LandEvent(velocity));
 
@@ -63,5 +75,23 @@ public class TraceController : TraceBehaviour {
 
         cc.Move(velocity * deltaTime);
     }
-    
+
+    public override bool AutoSaveFrameData
+    {
+        get
+        {
+            return true;
+        }
+    }
+
+    public override TimeTraceData GetFrameData(float time, int frame)
+    {
+        return new PositionTimeTraceData(time, frame, transform.position);
+    }
+
+    public override void LoadFrameData(TimeTraceData data)
+    {
+        var d = data as PositionTimeTraceData;
+        transform.position = d.position;
+    }
 }

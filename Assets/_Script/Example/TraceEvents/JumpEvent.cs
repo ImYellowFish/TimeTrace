@@ -4,6 +4,7 @@ using UnityEngine;
 using TimeTrace;
 using System;
 
+[System.Serializable]
 public class JumpEvent : InputEvent<Vector3> {
     TraceController player;
     public JumpEvent() : base(Vector3.zero, Vector3.zero) {
