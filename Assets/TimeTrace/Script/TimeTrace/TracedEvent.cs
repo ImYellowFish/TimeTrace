@@ -50,7 +50,9 @@ namespace TimeTrace {
         public virtual void Undo(float deltaTime) {
         }
 
-
+        /// <summary>
+        /// The event name will be showed in Inspector
+        /// </summary>
         public virtual string EventName {
             get { return "Undefined"; }
         }

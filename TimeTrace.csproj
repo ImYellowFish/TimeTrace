@@ -82,6 +82,7 @@
     <Compile Include="Assets\TimeTrace\Example\Script\SimpleController.cs" />
     <Compile Include="Assets\TimeTrace\Example\Script\SimpleGameManager.cs" />
     <Compile Include="Assets\TimeTrace\Example\Script\TestAnimController.cs" />
+    <Compile Include="Assets\TimeTrace\Example\Script\TestSceneReadme.cs" />
     <Compile Include="Assets\TimeTrace\Example\Script\TimeTraceToggle.cs" />
     <Compile Include="Assets\TimeTrace\Example\Script\TraceController.cs" />
     <Compile Include="Assets\TimeTrace\Example\Script\TraceEvents\GroundedEvent.cs" />

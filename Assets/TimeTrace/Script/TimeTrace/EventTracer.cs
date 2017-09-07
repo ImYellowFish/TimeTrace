@@ -4,8 +4,15 @@ using UnityEngine;
 
 namespace TimeTrace
 {
+    /// <summary>
+    /// A component which stores and manages traceEvent. 
+    /// Saved events will be automatically invoked or restored during time tracing.
+    /// </summary>
     public class EventTracer : MonoBehaviour, IFrameRecordable
     {
+        /// <summary>
+        /// Whether the event should be invoked when added.
+        /// </summary>
         public bool invokeEventWhenAdd = true;
 
         /// <summary>
@@ -19,7 +26,7 @@ namespace TimeTrace
             if(invokeEventWhenAdd)
                 e.Trace(TimeTraceManager.deltaTime);
             //Debug.Log("add event: " + e.name + ", t: " + e.time + ", ct: " + time);
-            DataTracer.AddData(e);
+            DataTracer.AddFrameData(e);
         }
 
         private void Update()
@@ -27,6 +34,7 @@ namespace TimeTrace
             DataTracer.UpdateLoadSaveFrameData(this);
         }
 
+        #region IFrameRecordable
         public FrameDataTracer eventTracerImpl = new FrameDataTracer();
         public FrameDataTracer DataTracer { get { return eventTracerImpl; } }
         public bool AutoSaveFrameData { get { return false; } }
@@ -41,5 +49,6 @@ namespace TimeTrace
         {
             return FrameData.Null;
         }
+        #endregion
     }
 }

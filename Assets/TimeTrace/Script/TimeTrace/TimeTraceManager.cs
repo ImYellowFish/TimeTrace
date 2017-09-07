@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 
 namespace TimeTrace {
+    /// <summary>
+    /// The main manager for TimeTrace functionality.
+    /// Maintains a custom time and frame, and offers a time backtracking method.
+    /// </summary>
     public class TimeTraceManager : MonoBehaviour {
         public static TimeTraceManager Instance {
             get {

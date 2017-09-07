@@ -7,6 +7,8 @@ namespace TimeTrace
 {
     /// <summary>
     /// Event which describes animation state change
+    /// Do: invoke the target animation specified by toHash
+    /// Undo: restore the source animation specified by fromHash
     /// </summary>
     public class AnimChangeEvent : TracedEvent
     {
@@ -43,6 +45,11 @@ namespace TimeTrace
         }
     }
 
+    /// <summary>
+    /// Traces and playback the animation.
+    /// note: All animations should be invoked through this component,
+    /// otherwise it won't be recorded.
+    /// </summary>
     [RequireComponent(typeof(Animator))]
     public class AnimationTracer : TraceBehaviour
     {
@@ -57,6 +64,10 @@ namespace TimeTrace
             at.SetFloat("Speed", TimeTraceManager.timeScale);
         }
 
+        /// <summary>
+        /// Play the animation specified by state
+        /// </summary>
+        /// <param name="state"></param>
         public void Play(string state)
         {           
             var stateInfo = at.GetCurrentAnimatorStateInfo(0);

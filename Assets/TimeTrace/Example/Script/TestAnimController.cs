@@ -14,7 +14,7 @@ public class TestAnimTestInput
 public class TestAnimController : MonoBehaviour {
     AnimationTracer at;
     public List<TestAnimTestInput> testInputs;
-
+    
 	// Use this for initialization
 	void Start () {
         at = GetComponent<AnimationTracer>();
@@ -32,4 +32,5 @@ public class TestAnimController : MonoBehaviour {
                 at.Play(inputConfig.anim);
         }
 	}
+    
 }

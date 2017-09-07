@@ -2,6 +2,9 @@
 
 namespace TimeTrace.Utility
 {
+    /// <summary>
+    /// Manages a circular array index
+    /// </summary>
     [System.Serializable]
     public class RepeatingArrayRange
     {

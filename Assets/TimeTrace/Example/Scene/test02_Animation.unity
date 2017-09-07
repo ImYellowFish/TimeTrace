@@ -3906,6 +3906,7 @@ MonoBehaviour:
     anim: UpDown
   - key: 52
     anim: LeftRight
+  readmeText: Press 1 ~ 4 to invoke different animations.
 --- !u!1 &604290619
 GameObject:
   m_ObjectHideFlags: 0
@@ -3915,6 +3916,7 @@ GameObject:
   m_Component:
   - component: {fileID: 604290621}
   - component: {fileID: 604290620}
+  - component: {fileID: 604290622}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -3947,6 +3949,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 3
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &604290622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 604290619}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e0dbaa612717c44eb59b99db1b30665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  readmeText: Press 1 ~ 4 to invoke animations. Press T to toggle time backtracking.
+    See how the animations get backtracked.
 --- !u!1 &691275217
 GameObject:
   m_ObjectHideFlags: 0

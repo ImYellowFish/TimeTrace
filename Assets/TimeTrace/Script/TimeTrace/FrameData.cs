@@ -2,6 +2,9 @@
 using System.Collections;
 
 namespace TimeTrace {
+    /// <summary>
+    /// Saves a frame based data, such as position, rotation, etc.
+    /// </summary>
     [System.Serializable]
     public class FrameData
     {

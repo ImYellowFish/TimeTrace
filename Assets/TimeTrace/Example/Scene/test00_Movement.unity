@@ -184,6 +184,7 @@ GameObject:
   - component: {fileID: 1421382985}
   - component: {fileID: 1421382983}
   - component: {fileID: 1421382986}
+  - component: {fileID: 1421382987}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -239,6 +240,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   backTrackTimeScale: -0.5
+--- !u!114 &1421382987
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_GameObject: {fileID: 1421382982}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e0dbaa612717c44eb59b99db1b30665, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  readmeText: Press WASD and Space to move the cube. Press T to toggle time backtracking.
 --- !u!1 &1598538543
 GameObject:
   m_ObjectHideFlags: 0

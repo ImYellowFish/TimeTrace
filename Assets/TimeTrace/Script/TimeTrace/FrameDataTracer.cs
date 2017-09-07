@@ -4,6 +4,11 @@ using TimeTrace.Utility;
 
 namespace TimeTrace
 {
+    /// <summary>
+    /// An interface for those which needs to store and manage frame based data.
+    /// It uses a FrameDataTracer for save/load function.
+    /// You should call FrameDataTracer.UpdateLoadSaveFrameData(IFrameRecordable tb) in its Update()
+    /// </summary>
     public interface IFrameRecordable
     {
         /// <summary>
@@ -36,7 +41,7 @@ namespace TimeTrace
     [System.Serializable]
     public class FrameDataTracer
     {
-        public FrameDataTimeline dataTimeline = new FrameDataTimeline(TimeTraceManager.maxRecordFrame);
+        private FrameDataTimeline dataTimeline = new FrameDataTimeline(TimeTraceManager.maxRecordFrame);
         protected bool isPreviousFrameTracing = false;
         private bool isPreviousFrameBackTracing = false;
         private int lastLoadedFrameIndex;
@@ -45,13 +50,22 @@ namespace TimeTrace
         
         private List<FrameData> framesToLoad = new List<FrameData>();
 
-        public void AddData(FrameData data)
+        /// <summary>
+        /// Add a new frame data to records
+        /// </summary>
+        /// <param name="data"></param>
+        public void AddFrameData(FrameData data)
         {
             dataTimeline.Add(data);
             if (debug)
                 debugger.RecordSave(data);
         }
 
+        /// <summary>
+        /// Auto save/load frames based on TimeTraceManager state.
+        /// Should be called in Update() of its host Component.
+        /// </summary>
+        /// <param name="tb"></param>
         public void UpdateLoadSaveFrameData(IFrameRecordable tb)
         {
             float time = TimeTraceManager.time;

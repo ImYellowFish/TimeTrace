@@ -13,6 +13,10 @@ namespace TimeTrace.Utility
         void RemoveFromIndexToEnd(int index);
     }
 
+    /// <summary>
+    /// Stores a list of frame data, and organize this by frame count. 
+    /// Can search for frame data by specified time or frame.
+    /// </summary>
     [System.Serializable]
     public class FrameDataTimeline : IFrameDataTimeline
     {

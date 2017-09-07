@@ -4,7 +4,30 @@ using UnityEngine;
 using TimeTrace.Utility;
 
 namespace TimeTrace {
+    /// <summary>
+    /// Trace behaviour is a type of MonoBehaviour which has a playback utility.
+    /// 
+    /// To achieve this, it has a update function which uses TimeTraceManager.deltaTime instead of 
+    /// Time.deltaTime. It also has a recorder for frame based data (such as position in every frame) and
+    /// event data (such as state change event), and synchronize the recorded data when playing back.
+    /// </summary>
     public abstract class TraceBehaviour : MonoBehaviour, IFrameRecordable{
+        /// <summary>
+        /// Manages the traced events for this object
+        /// 
+        /// </summary>
+        public EventTracer LocalEventTracer
+        {
+            get
+            {
+                if (eventTracer == null)
+                    eventTracer = gameObject.GetComponent<EventTracer>();
+                if (eventTracer == null)
+                    eventTracer = gameObject.AddComponent<EventTracer>();
+                return eventTracer;
+            }
+        }
+
         /// <summary>
         /// This trace update will be called during every update
         /// When backtracing, this trace update will be called too
@@ -45,7 +68,10 @@ namespace TimeTrace {
 
 
         public FrameDataTracer dataTracer = new FrameDataTracer();
-        public FrameDataTracer DataTracer { get { return dataTracer; } }      
+        public FrameDataTracer DataTracer { get { return dataTracer; } }
         public virtual bool AutoSaveFrameData { get { return true; } }
+
+        private EventTracer eventTracer;
+        
     }
 }
