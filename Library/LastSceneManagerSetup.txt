@@ -1,4 +1,0 @@
-sceneSetups:
-- path: Assets/TimeTrace/Example/Scene/test00.unity
-  isLoaded: 1
-  isActive: 1
