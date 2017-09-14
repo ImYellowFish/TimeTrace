@@ -22,9 +22,9 @@ namespace TimeTrace {
         public static float deltaTime { get { return Instance.m_timeScale * Time.deltaTime; } }
         public static bool tracing { get { return Instance.m_tracing; } }
         public static bool backTracing { get { return Instance.m_backTracing; } }
-        public static int frameCount { get { return Mathf.RoundToInt(Instance.m_frame); } }
+        public static int frameCount { get { return Mathf.FloorToInt(Instance.m_frame); } }
         public static int deltaFrame { get { return frameCount - Instance.m_previousFrameCount; } }
-        public static int maxRecordFrame { get { return 1800; } }
+        public static int maxRecordFrame { get { return 600; } }
         public static EventTracer eventTracer { get { return Instance.m_eventTracer; } }
 
         /// <summary>
@@ -102,8 +102,8 @@ namespace TimeTrace {
         private void Update()
         {
             m_previousFrameCount = frameCount;
-            m_time += deltaTime;
-            m_frame += timeScale;
+            m_time = Mathf.Max(0, m_time + deltaTime);
+            m_frame = Mathf.Max(0, m_frame + timeScale);
             
             if (tracing)
             {

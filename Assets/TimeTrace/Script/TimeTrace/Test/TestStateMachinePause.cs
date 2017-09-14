@@ -5,27 +5,9 @@ using MonsterLove.StateMachine;
 
 namespace TimeTrace.Test
 {
-    public class Bullet : MonoBehaviour
-    {
-
-    }
-
+    
     public class TestStateMachinePause : MonoBehaviour
     {
-        public GameObject prefab;
-        void Test()
-        {
-            GameObject go = Instantiate(prefab);
-            var bullet = GetComponent<Bullet>();
-        }
-
-        public Bullet bulletPrefab;
-        void Test2()
-        {
-            Bullet bullet = Instantiate(bulletPrefab);
-        }
-
-
         [Header("Config")]
         public StateTransition mode;
         public float stateTransitionDuration = 10;

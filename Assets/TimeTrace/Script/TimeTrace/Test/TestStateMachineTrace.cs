@@ -48,6 +48,14 @@ namespace TimeTrace.Test
             }
         }
 
+        public override void RevertableUpdate(float deltaTime) {
+            base.RevertableUpdate(deltaTime);
+            if (Input.GetKeyDown(KeyCode.R)) {
+                FireTestTrigger();
+            }
+        }
+
+        
         [ContextMenu("FireTestTrigger")]
         public void FireTestTrigger()
         {

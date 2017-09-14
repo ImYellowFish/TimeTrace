@@ -76,14 +76,7 @@ public class TraceController : TraceBehaviour {
         cc.Move(velocity * deltaTime);
     }
 
-    public override bool AutoSaveFrameData
-    {
-        get
-        {
-            return true;
-        }
-    }
-
+    
     public override FrameData GetFrameData(float time, int frame)
     {
         return new PositionTimeTraceData(time, frame, transform.position);
@@ -93,5 +86,11 @@ public class TraceController : TraceBehaviour {
     {
         var d = data as PositionTimeTraceData;
         transform.position = d.position;
+    }
+
+    public override bool EnableRecordFrameData {
+        get {
+            return true;
+        }
     }
 }

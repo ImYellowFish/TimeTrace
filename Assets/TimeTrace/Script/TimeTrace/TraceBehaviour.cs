@@ -12,6 +12,23 @@ namespace TimeTrace {
     /// event data (such as state change event), and synchronize the recorded data when playing back.
     /// </summary>
     public abstract class TraceBehaviour : MonoBehaviour, IFrameRecordable{
+
+        // ----------------- Update ------------------
+
+        /// <summary>
+        /// This trace update will be called during every update
+        /// When backtracing, this trace update will be called too
+        /// with a nagative delta time.
+        /// 
+        /// The implementation should be applicable for both front tracing and back tracing
+        /// </summary>
+        /// <param name="deltaTime"></param>
+        public abstract void RevertableUpdate(float deltaTime);
+
+
+
+        // ----------------- Event Data ------------------
+
         /// <summary>
         /// Manages the traced events for this object
         /// 
@@ -27,17 +44,19 @@ namespace TimeTrace {
                 return eventTracer;
             }
         }
+        private EventTracer eventTracer;
+
+
+        
+        // ----------------- Frame Data ------------------
 
         /// <summary>
-        /// This trace update will be called during every update
-        /// When backtracing, this trace update will be called too
-        /// with a nagative delta time.
-        /// 
-        /// The implementation should be applicable for both front tracing and back tracing
+        /// Whether this component should use a data buffer to record sync data every Update, such as position, rot, etc.
+        /// The data will automatically be synchronized when tracing
         /// </summary>
-        /// <param name="deltaTime"></param>
-        public abstract void RevertableUpdate(float deltaTime);
+        public abstract bool EnableRecordFrameData { get; }
 
+        
         /// <summary>
         /// Get the current frame data for synchronization
         /// Called when not tracing;
@@ -58,20 +77,37 @@ namespace TimeTrace {
 
         }
 
-
+        /// <summary>
+        /// Whether frame data is auto recorded every Update
+        /// </summary>
+        public bool AutoSaveFrameData { get { return EnableRecordFrameData; } }
 
         
+        /// <summary>
+        /// Get the frame data container
+        /// </summary>
+        public FrameDataTracer DataTracer {
+            get {
+                if (dataTracer == null)
+                    dataTracer = new FrameDataTracer();
+
+                return dataTracer;
+            }
+        }
+        public FrameDataTracer dataTracer;
+
+
+
         protected void Update() {
             RevertableUpdate(TimeTraceManager.deltaTime);
-            DataTracer.UpdateLoadSaveFrameData(this);
+
+            if(EnableRecordFrameData)
+                DataTracer.UpdateLoadSaveFrameData(this);
         }
 
 
-        public FrameDataTracer dataTracer = new FrameDataTracer();
-        public FrameDataTracer DataTracer { get { return dataTracer; } }
-        public virtual bool AutoSaveFrameData { get { return true; } }
+        
 
-        private EventTracer eventTracer;
         
     }
 }

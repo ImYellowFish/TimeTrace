@@ -11,39 +11,51 @@ namespace TimeTrace.StateMachine
         where TTrigger : struct, IConvertible, IComparable
     {
         #region Interface
-        
+        /// <summary>
+        /// (readonly)
+        /// When backtracking, currentState is the state to enter when backtracking ends.
+        /// When not tracking, currentState is the state of stateMachine.
+        /// </summary>
+        public TState currentState;
+
+
+        /// <summary>
+        /// Time since current state started.
+        /// This is needed to backtrack stateMachine.
+        /// </summary>
+        public float StateTimer;
+
+
         /// <summary>
         /// Fire a trigger to invoke state transitions.
         /// Will record state change events for tracing.
         /// </summary>
         public bool Fire(TTrigger trigger)
         {
-            TState state = stateMachine.State;
+            TState oldState = stateMachine.State;
+            float oldTimer = StateTimer;
+
             bool val = transitionManager.Fire(trigger);
             if (val)
             {
                 LocalEventTracer.AddTraceEvent(new StateChangeEvent<TTrigger, TState>(
-                        this, state, stateMachine.State, StateTimer
+                        this, oldState, stateMachine.State, oldTimer
                     ));
             }
             
             return val;
         }
 
+        
         /// <summary>
-        /// Time since current state started.
-        /// This is needed to backtrack stateMachine.
-        /// </summary>
-        public float StateTimer { get; set; }
-
-        /// <summary>
-        /// Set stateMachine to specified state and timer
-        /// Will not invoke state callbacks.
+        /// Set stateMachine to specified state and timer.
+        /// Used by class StateChangeEvent.
         /// </summary>
         public void SetStateTo(TState state, float timer)
         {
             stateMachine.ChangeState(state, StateTransition.Overwrite);
             StateTimer = timer;
+            currentState = state;
         }
 
         /// <summary>
@@ -96,10 +108,14 @@ namespace TimeTrace.StateMachine
         public override void RevertableUpdate(float deltaTime)
         {
             // Update the state timer
-            StateTimer += deltaTime;
+            StateTimer = Mathf.Max(0, StateTimer + deltaTime);
 
             // Pause the statemachine if tracing
             SetStateMachinePaused(TimeTraceManager.tracing);
+
+            // Update trace result state.
+            if (!TimeTraceManager.tracing)
+                currentState = stateMachine.State;
         }
 
         // StateTimer is reset before a transition happens
@@ -108,6 +124,13 @@ namespace TimeTrace.StateMachine
         {
             StateTimer = 0;
         }
+
+        public override bool EnableRecordFrameData {
+            get {
+                return false;
+            }
+        }
+
         #endregion
     }
 

@@ -79,8 +79,13 @@ namespace TimeTrace
                 Debug.LogWarning("Playing a missing animation state: " + state);
             }
 
-            TimeTraceManager.AddTraceEvent(new AnimChangeEvent(this, from, to, stateInfo.normalizedTime));
+            LocalEventTracer.AddTraceEvent(new AnimChangeEvent(this, from, to, stateInfo.normalizedTime));
         }
-        
+
+        public override bool EnableRecordFrameData {
+            get {
+                return false;
+            }
+        }
     }
 }

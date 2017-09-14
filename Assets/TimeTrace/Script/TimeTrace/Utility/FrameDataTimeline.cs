@@ -97,8 +97,8 @@ namespace TimeTrace.Utility
             if (DataCount == 0)
                 return false;
 
-            // da.Length - 1 is the number of elements we need to check
-            for (int i = 0; i < dataArray.Length; i++)
+            // DataCount is the number of elements we need to check
+            for (int i = 0; i < DataCount; i++)
             {
                 if (IsInRange.Invoke(dataArray[searchIndex]))
                 {
