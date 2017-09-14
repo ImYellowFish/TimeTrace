@@ -23,9 +23,8 @@ namespace TimeTrace.StateMachine
             if (val)
             {
                 LocalEventTracer.AddTraceEvent(new StateChangeEvent<TTrigger, TState>(
-                        this, state, stateMachine.State, Timer
+                        this, state, stateMachine.State, StateTimer
                     ));
-                Timer = 0;
             }
             
             return val;
@@ -35,13 +34,17 @@ namespace TimeTrace.StateMachine
         /// Time since current state started.
         /// This is needed to backtrack stateMachine.
         /// </summary>
-        public float Timer { get; set; }
+        public float StateTimer { get; set; }
 
         /// <summary>
         /// Set stateMachine to specified state and timer
         /// Will not invoke state callbacks.
         /// </summary>
-        public abstract void SetStateTo(TState state, float timer);
+        public void SetStateTo(TState state, float timer)
+        {
+            stateMachine.ChangeState(state, StateTransition.Overwrite);
+            StateTimer = timer;
+        }
 
         /// <summary>
         /// Init your statemachine transitions here
@@ -53,11 +56,17 @@ namespace TimeTrace.StateMachine
         /// </summary>
         protected abstract bool EnableTransitionToSelf { get; }
 
-        protected abstract void SetStateMachinePaused(bool val);
+        protected void SetStateMachinePaused(bool val)
+        {
+            if (val)
+                stateMachine.Pause();
+            else
+                stateMachine.Resume();
+        }
 
         protected IEnumerator WaitForTimer(float targetTimer)
         {
-            while(Timer < targetTimer)
+            while(StateTimer < targetTimer)
             {
                 yield return null;
             }
@@ -78,6 +87,7 @@ namespace TimeTrace.StateMachine
         {
             stateMachine = StateMachine<TState>.Initialize(this, default(TState), EnableTransitionToSelf);
             transitionManager = new TransitionManager<TTrigger, TState>(stateMachine);
+            transitionManager.BeforeTriggered += BeforeTransitionTriggered;
             LocalEventTracer.invokeEventWhenAdd = false;
 
             InitTransitions();
@@ -86,13 +96,18 @@ namespace TimeTrace.StateMachine
         public override void RevertableUpdate(float deltaTime)
         {
             // Update the state timer
-            Timer += deltaTime;
+            StateTimer += deltaTime;
 
             // Pause the statemachine if tracing
             SetStateMachinePaused(TimeTraceManager.tracing);
         }
 
-        
+        // StateTimer is reset before a transition happens
+        // we must do this before transition, or may cause error during OnEnter in the new state, if StateTimer is used
+        private void BeforeTransitionTriggered(Transition<TTrigger, TState> transition)
+        {
+            StateTimer = 0;
+        }
         #endregion
     }
 

@@ -98,6 +98,8 @@
     <Compile Include="Assets\TimeTrace\Script\TimeTrace\StateMachine\StateMachineRunner.cs" />
     <Compile Include="Assets\TimeTrace\Script\TimeTrace\StateMachine\TrackedStateMachine.cs" />
     <Compile Include="Assets\TimeTrace\Script\TimeTrace\StateMachine\TransitionManager.cs" />
+    <Compile Include="Assets\TimeTrace\Script\TimeTrace\Test\TestStateMachinePause.cs" />
+    <Compile Include="Assets\TimeTrace\Script\TimeTrace\Test\TestStateMachineTrace.cs" />
     <Compile Include="Assets\TimeTrace\Script\TimeTrace\TimeTraceManager.cs" />
     <Compile Include="Assets\TimeTrace\Script\TimeTrace\TraceBehaviour.cs" />
     <Compile Include="Assets\TimeTrace\Script\TimeTrace\TracedEvent.cs" />

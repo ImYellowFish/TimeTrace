@@ -42,6 +42,7 @@ namespace MonsterLove.StateMachine
 		MonoBehaviour Component { get; }
 		StateMapping CurrentStateMap { get; }
 		bool IsInTransition { get; }
+        bool Paused { get; }
 	}
 
 	public class StateMachine<T> : IStateMachine where T : struct, IConvertible, IComparable
@@ -61,10 +62,10 @@ namespace MonsterLove.StateMachine
 
 		private bool isInTransition = false;
 		private IEnumerator currentTransition;
-		private IEnumerator exitRoutine;
+        private IEnumerator queuedChange;
+        private IEnumerator exitRoutine;
 		private IEnumerator enterRoutine;
-		private IEnumerator queuedChange;
-
+		
         public bool enableTransitionToSelf { get; set; }
 
 		public StateMachine(StateMachineRunner engine, MonoBehaviour component)
@@ -225,9 +226,9 @@ namespace MonsterLove.StateMachine
 
 						if (enterRoutine != null) //We are already entering our previous target state. Need to wait for that to finish and call the exit routine.
 						{
-							//Damn, I need to test this hard
-							queuedChange = WaitForPreviousTransition(nextState);
-							engine.StartCoroutine(queuedChange);
+                            //Damn, I need to test this hard
+                            queuedChange = SuspensibleRoutineWrapper(WaitForPreviousTransition(nextState));
+                            StartRunnerCoroutine(queuedChange);
 							return;
 						}
 					}
@@ -254,8 +255,8 @@ namespace MonsterLove.StateMachine
 			if ((currentState != null && currentState.hasExitRoutine) || nextState.hasEnterRoutine)
 			{
 				isInTransition = true;
-				currentTransition = ChangeToNewStateRoutine(nextState, transition);
-				engine.StartCoroutine(currentTransition);
+                currentTransition = SuspensibleRoutineWrapper(ChangeToNewStateRoutine(nextState, transition));
+                StartRunnerCoroutine(currentTransition);
 			}
 			else //Same frame transition, no coroutines are present
 			{
@@ -287,11 +288,11 @@ namespace MonsterLove.StateMachine
 			{
 				if (currentState.hasExitRoutine)
 				{
-					exitRoutine = currentState.ExitRoutine();
+					exitRoutine = SuspensibleRoutineWrapper(currentState.ExitRoutine());
 
 					if (exitRoutine != null && transition != StateTransition.Overwrite) //Don't wait for exit if we are overwriting
 					{
-						yield return engine.StartCoroutine(exitRoutine);
+						yield return StartRunnerCoroutine(exitRoutine);
 					}
 
 					exitRoutine = null;
@@ -311,11 +312,11 @@ namespace MonsterLove.StateMachine
 			{
 				if (currentState.hasEnterRoutine)
 				{
-					enterRoutine = currentState.EnterRoutine();
+					enterRoutine = SuspensibleRoutineWrapper(currentState.EnterRoutine());
 
 					if (enterRoutine != null)
 					{
-						yield return engine.StartCoroutine(enterRoutine);
+						yield return StartRunnerCoroutine(enterRoutine);
 					}
 
 					enterRoutine = null;
@@ -406,32 +407,53 @@ namespace MonsterLove.StateMachine
             return fsm;
 		}
 
+        // ------------  Pause/Continue ------------
+        public bool Paused { get { return paused; } }
+        private bool paused;
+        public void Pause()
+        {
+            paused = true;
+        }
 
-        //IEnumerator CallWrapper()
-        //{
-        //    yield return null;
-        //    IEnumerator e = coroutine;
-        //    while (running)
-        //    {
-        //        if (paused)
-        //            yield return null;
-        //        else
-        //        {
-        //            if (e != null && e.MoveNext())
-        //            {
-        //                yield return e.Current;
-        //            }
-        //            else
-        //            {
-        //                running = false;
-        //            }
-        //        }
-        //    }
+        public void Resume()
+        {
+            paused = false;
+        }
 
-        //    FinishedHandler handler = Finished;
-        //    if (handler != null)
-        //        handler(stopped);
-        //}
+        /// <summary>
+        /// Start a coroutine on StateMachineRunner.
+        /// </summary>
+        private Coroutine StartRunnerCoroutine(IEnumerator routine)
+        {
+            return engine.StartCoroutine(routine);
+        }
+
+        /// <summary>
+        /// Wrap the routine in a suspensible pattern
+        /// </summary>
+        /// <param name="coroutine"></param>
+        /// <returns></returns>
+        IEnumerator SuspensibleRoutineWrapper(IEnumerator coroutine)
+        {
+            IEnumerator e = coroutine;
+            
+            while (true)
+            {
+                if (paused)
+                    yield return null;
+                else
+                {
+                    if (e != null && e.MoveNext())
+                    {
+                        yield return e.Current;
+                    }
+                    else
+                    {
+                        yield break;
+                    }
+                }
+            }
+        }
     }
 
 }

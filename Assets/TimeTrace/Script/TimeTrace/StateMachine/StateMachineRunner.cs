@@ -70,7 +70,7 @@ namespace MonsterLove.StateMachine
 			for (int i = 0; i < stateMachineList.Count; i++)
 			{
 				var fsm = stateMachineList[i];
-				if(!fsm.IsInTransition && fsm.Component.enabled) fsm.CurrentStateMap.FixedUpdate();
+				if(!fsm.IsInTransition && fsm.Component.enabled && !fsm.Paused) fsm.CurrentStateMap.FixedUpdate();
 			}
 		}
 
@@ -79,7 +79,7 @@ namespace MonsterLove.StateMachine
 			for (int i = 0; i < stateMachineList.Count; i++)
 			{
 				var fsm = stateMachineList[i];
-				if (!fsm.IsInTransition && fsm.Component.enabled)
+				if (!fsm.IsInTransition && fsm.Component.enabled && !fsm.Paused)
 				{
 					fsm.CurrentStateMap.Update();
 				}
@@ -91,7 +91,7 @@ namespace MonsterLove.StateMachine
 			for (int i = 0; i < stateMachineList.Count; i++)
 			{
 				var fsm = stateMachineList[i];
-				if (!fsm.IsInTransition && fsm.Component.enabled)
+				if (!fsm.IsInTransition && fsm.Component.enabled && !fsm.Paused)
 				{
 					fsm.CurrentStateMap.LateUpdate();
 				}
@@ -122,10 +122,12 @@ namespace MonsterLove.StateMachine
 		{
 			yield break;
 		}
-	}
 
-	
-	public class StateMapping
+        
+    }
+
+
+    public class StateMapping
 	{
 		public object state;
 
@@ -147,7 +149,7 @@ namespace MonsterLove.StateMachine
 		{
 			this.state = state;
 		}
-
+        
 	}
 }
 
